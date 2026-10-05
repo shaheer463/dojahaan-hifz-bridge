@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DoJahaan Hifz Bridge</title>
+<meta name="description" content="Hifz Bridge by DoJahaan: kids practice Surahs 99 to 114 in Indo-Pak script and learn the meanings of key words. Works offline.">
+<meta name="theme-color" content="#12836E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hifz Bridge">
+<style>html,body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<style>
+@font-face{font-family:"Baloo 2";font-weight:500;font-display:swap;src:url(fonts/baloo2-500.woff2) format("woff2")}
+@font-face{font-family:"Baloo 2";font-weight:600;font-display:swap;src:url(fonts/baloo2-600.woff2) format("woff2")}
+@font-face{font-family:"Baloo 2";font-weight:700;font-display:swap;src:url(fonts/baloo2-700.woff2) format("woff2")}
+@font-face{font-family:"Baloo 2";font-weight:800;font-display:swap;src:url(fonts/baloo2-800.woff2) format("woff2")}
+@font-face{font-family:"IndoPak";src:url(fonts/indopak.woff2) format("woff2");font-display:block}
+:root{
+  --sky:#E8F4FB; --sky2:#D3EAF7; --card:#FFFFFF; --ink:#1B3140; --muted:#5B7282; --line:#D5E4EE;
+  --hifz:#12836E; --hifz-soft:#DDF3EC; --hifz-deep:#0B5C4E;
+  --word:#EE7D1E; --word-soft:#FFEBD6; --word-deep:#A84F06;
+  --gold:#F4B400; --gold-soft:#FFF3C4; --good:#1E9E5A; --good-soft:#DCF5E6; --bad:#E0534A; --bad-soft:#FDE3E1;
+  --hl:#FFE27A;
+  --ui:"Baloo 2", "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  --ar:"IndoPak", "Noto Naskh Arabic", serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--sky);color:var(--ink)}
+body{font-family:var(--ui);font-size:18px;line-height:1.4;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:14px 60px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance}
+.ar{font-family:var(--ar);direction:rtl}
+img.ic{width:1em;height:1em;vertical-align:-0.15em}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;min-height:52px}
+.back{width:52px;height:52px;border-radius:18px;background:var(--card);box-shadow:0 3px 0 var(--line);font-size:26px;font-weight:800;display:grid;place-items:center;flex:none}
+.crumb{flex:1;min-width:0}
+.crumb small{display:block;color:var(--muted);font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumb b{display:block;font-size:22px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stars{display:flex;align-items:center;gap:4px;background:var(--gold-soft);border-radius:999px;padding:4px 12px 4px 6px;font-weight:800;font-size:20px;flex:none;font-variant-numeric:tabular-nums}
+.stars img{width:30px;height:30px}
+
+/* home */
+.hero{text-align:center;padding:8px 0 18px}
+.hero h1{font-size:clamp(34px,8vw,48px);font-weight:800;color:var(--hifz-deep);letter-spacing:-.5px}
+.hero p{margin:4px 0 0;color:var(--muted);font-size:17px}
+.logocard{background:#FEFBF4;border-radius:28px;padding:6px 10px;box-shadow:0 4px 0 var(--line);max-width:340px;margin:0 auto 10px}
+.logocard img{display:block;width:100%;height:auto}
+.hero p b{color:var(--hifz-deep)}
+.brandrow{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:2px}
+.brandrow svg{width:112px;height:112px;filter:drop-shadow(0 4px 0 rgba(27,49,64,.12))}
+.brandrow .dj{font-weight:800;font-size:22px;letter-spacing:.5px;color:var(--ink)}
+.brandrow .dj b{color:var(--word)}
+.hero h1 sup{font-size:.32em;vertical-align:super;color:var(--muted);font-weight:700}
+.tag{display:inline-block;margin-top:6px;background:var(--card);border-radius:999px;padding:3px 14px;font-size:15px;font-weight:700;color:var(--hifz-deep);box-shadow:0 2px 0 var(--line)}
+.legal{margin-top:8px;font-weight:700;color:var(--ink);opacity:.7}
+.doors{display:grid;gap:16px}
+@media (min-width:620px){.doors{grid-template-columns:1fr 1fr}}
+.door{border-radius:28px;padding:20px;text-align:left;display:flex;flex-direction:column;gap:10px;color:#fff;position:relative;overflow:hidden;min-height:220px;box-shadow:0 6px 0 rgba(0,0,0,.15)}
+.door:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.door.h{background:linear-gradient(160deg,#17A386,var(--hifz))}
+.door.w{background:linear-gradient(160deg,#FF9C3F,var(--word))}
+.door img.big{width:92px;height:92px}
+.door h2{font-size:32px;font-weight:800}
+.door p{margin:0;font-size:17px;opacity:.95;line-height:1.3}
+.door .prog{margin-top:auto;background:rgba(255,255,255,.22);border-radius:999px;height:14px;overflow:hidden}
+.door .prog i{display:block;height:100%;background:#fff;border-radius:999px}
+.door .pl{font-size:15px;font-weight:700;opacity:.95}
+.wbadge{margin-top:4px;display:inline-flex;align-items:center;gap:4px;background:var(--bad-soft);color:var(--bad);border-radius:999px;padding:1px 10px;font-weight:800;font-size:14px}
+.weak{background:var(--bad-soft);border:3px solid #F5B5AF;border-radius:24px;padding:14px 16px;margin-top:2px}
+.weak .wh{font-weight:800;font-size:21px;color:#B23A32;display:flex;align-items:center;gap:8px}
+.weak .wh span{background:var(--bad);color:#fff;border-radius:999px;padding:0 10px;font-size:16px}
+.weak p{margin:2px 0 10px;color:#7A4A46;font-size:16px}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.wchip{background:#fff;border-radius:16px;padding:6px 12px;box-shadow:0 3px 0 #F0C6C1;display:flex;flex-direction:column;align-items:center}
+.wchip b{font-size:17px;color:#B23A32}
+.wchip .ar{font-size:22px;line-height:1.9;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.wchip:active{transform:translateY(2px);box-shadow:none}
+.flag{display:flex;justify-content:center;align-items:center;gap:6px;color:#B23A32;font-weight:800;font-size:16px;margin-bottom:4px}
+.credits{margin-top:28px;color:var(--muted);font-size:13px;line-height:1.5}
+
+/* lists */
+.intro{color:var(--muted);font-size:17px;margin:-4px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.scard{background:var(--card);border-radius:22px;padding:12px 14px;text-align:center;box-shadow:0 4px 0 var(--line);display:flex;flex-direction:column;gap:2px;align-items:center}
+.scard:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.scard .num{font-size:13px;font-weight:800;color:var(--muted)}
+.scard .an{font-family:var(--ar);font-size:34px;line-height:1.6;color:var(--hifz-deep)}
+.scard .tr{font-weight:800;font-size:18px;line-height:1.1}
+.scard .en{font-size:14px;color:var(--muted);line-height:1.2}
+.mini{display:flex;gap:2px;margin-top:4px}
+.mini img{width:22px;height:22px}
+.mini img.off{filter:grayscale(1);opacity:.25}
+
+.lcard{background:var(--card);border-radius:24px;padding:14px 16px;text-align:left;box-shadow:0 4px 0 var(--line);display:grid;grid-template-columns:64px 1fr auto;gap:4px 14px;align-items:center;width:100%}
+.lcard:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.lcard .lv{grid-row:span 2;width:64px;height:64px;border-radius:20px;background:var(--word-soft);color:var(--word-deep);display:grid;place-items:center;font-size:32px;font-weight:800}
+.lcard h3{font-size:21px;font-weight:800}
+.lcard .pics{display:flex;flex-wrap:wrap;gap:2px}
+.lcard .pics img,.lcard .pics .cal{width:30px;height:30px}
+.lcard .mini{grid-row:span 2;flex-direction:column}
+.list{display:grid;gap:12px}
+
+/* step path */
+.steps{display:grid;gap:14px}
+.step{background:var(--card);border-radius:26px;padding:16px;display:grid;grid-template-columns:76px 1fr auto;gap:2px 14px;align-items:center;text-align:left;box-shadow:0 5px 0 var(--line);width:100%}
+.step:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
+.step img.big{grid-row:span 2;width:76px;height:76px}
+.step h3{font-size:24px;font-weight:800}
+.step p{margin:0;color:var(--muted);font-size:16px;line-height:1.25}
+.step .n{grid-row:span 2;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:20px;background:var(--sky2);color:var(--muted)}
+.step .n.done{background:var(--good);color:#fff}
+.step .n img{width:30px;height:30px}
+
+/* ayah stage */
+.stage{background:var(--card);border-radius:28px;padding:18px 16px;box-shadow:0 5px 0 var(--line)}
+.ayahbig{font-family:var(--ar);direction:rtl;text-align:center;font-size:clamp(30px,7.4vw,44px);line-height:2.15;word-spacing:.05em}
+.ayahbig .tk{border-radius:10px;padding:0 2px;transition:background .12s}
+.ayahbig .tk.on{background:var(--hl)}
+.ayahbig .tk.past{color:var(--hifz-deep)}
+.ayahbig.hidden .tk{filter:blur(12px);opacity:.6}
+.ayahbig .tk.peek{filter:none;opacity:1}
+.prev{font-family:var(--ar);direction:rtl;text-align:center;font-size:clamp(22px,5vw,28px);line-height:2;color:var(--muted);opacity:.7}
+.meaning{margin-top:6px;text-align:center;color:var(--muted);font-size:18px;display:flex;gap:8px;align-items:flex-start;justify-content:center}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--sky);border-radius:999px;padding:4px 12px;font-weight:700;font-size:15px;color:var(--muted)}
+.ctrls{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+.round{width:62px;height:62px;border-radius:50%;background:var(--sky);font-size:26px;display:grid;place-items:center;box-shadow:0 3px 0 var(--line)}
+.round.main{width:84px;height:84px;font-size:36px;background:var(--hifz);color:#fff;box-shadow:0 5px 0 var(--hifz-deep)}
+.round:active{transform:translateY(3px);box-shadow:none}
+.opts{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{border-radius:999px;padding:6px 14px;background:var(--sky);font-weight:700;font-size:16px;color:var(--muted);border:2px solid transparent}
+.chip.on{background:var(--hifz-soft);border-color:var(--hifz);color:var(--hifz-deep)}
+.prog2{display:flex;gap:6px;justify-content:center;margin:0 0 10px;flex-wrap:wrap}
+.prog2 i{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.prog2 i.c{background:var(--hifz)} .prog2 i.g{background:var(--good)} .prog2 i.b{background:var(--gold)}
+.w .prog2 i.c{background:var(--word)}
+.big-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.btn{white-space:nowrap;border-radius:20px;padding:12px 22px;font-weight:800;font-size:21px;background:var(--hifz);color:#fff;box-shadow:0 5px 0 var(--hifz-deep);display:inline-flex;align-items:center;gap:8px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--hifz-deep)}
+.btn.or{background:var(--word);box-shadow:0 5px 0 var(--word-deep)}
+.btn.gold{background:var(--gold);color:#3A2A00;box-shadow:0 5px 0 #B98800}
+.btn.soft{background:var(--sky);color:var(--ink);box-shadow:0 5px 0 var(--line)}
+.btn img{width:28px;height:28px}
+.say{text-align:center;font-size:24px;font-weight:800;margin:0 0 6px}
+
+/* puzzle */
+.slots{display:flex;flex-direction:column;gap:6px;min-height:80px;border:3px dashed var(--line);border-radius:22px;padding:8px 12px}
+.slots .ln{font-family:var(--ar);direction:rtl;font-size:clamp(24px,5.6vw,32px);line-height:2;display:flex;gap:10px;align-items:center;color:var(--hifz-deep)}
+.slots .ph{color:var(--muted);text-align:center;padding:16px 0;font-size:17px}
+.pile{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.piece{background:var(--card);border-radius:20px;padding:6px 16px;font-family:var(--ar);direction:rtl;font-size:clamp(24px,5.6vw,32px);line-height:2;text-align:right;box-shadow:0 4px 0 var(--line);border:3px solid transparent}
+.piece:active{transform:translateY(3px);box-shadow:none}
+.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+
+/* word card */
+.wcard{background:var(--card);border-radius:30px;padding:18px 16px 16px;box-shadow:0 6px 0 var(--line);text-align:center}
+.art{width:min(210px,52vw);height:min(210px,52vw);margin:0 auto;border-radius:36px;background:var(--word-soft);display:grid;place-items:center}
+.art img{width:78%;height:78%}
+.cal{display:grid;place-items:center;border-radius:28%;background:radial-gradient(circle at 50% 40%,#1B7A69,#0B4A40);color:var(--gold);font-family:var(--ar);position:relative;overflow:hidden}
+.cal svg{position:absolute;inset:6%;width:88%;height:88%;opacity:.5}
+.cal span{position:relative;line-height:1}
+.art.cal span{font-size:clamp(44px,13vw,64px);margin-top:.25em}
+.wbig{font-family:var(--ar);font-size:clamp(54px,15vw,84px);line-height:1.9;color:var(--word-deep);display:inline-flex;align-items:center;gap:12px;direction:rtl}
+.spk{width:56px;height:56px;border-radius:50%;background:var(--word);display:grid;place-items:center;box-shadow:0 4px 0 var(--word-deep);flex:none;direction:ltr}
+.spk img{width:34px;height:34px}
+.spk.sm{width:44px;height:44px;background:var(--sky);box-shadow:0 3px 0 var(--line)}
+.spk.sm img{width:26px;height:26px}
+.spk:active{transform:translateY(3px);box-shadow:none}
+.spk.playing{animation:pulse .8s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.trn{color:var(--muted);font-size:18px;font-weight:600;margin-top:-6px}
+.mean{display:flex;align-items:center;justify-content:center;gap:10px;font-size:clamp(24px,6vw,30px);font-weight:800;margin:6px 0 4px;line-height:1.15}
+.ex{background:var(--gold-soft);border-radius:20px;padding:12px 14px;display:flex;gap:10px;align-items:center;text-align:left;margin-top:12px;font-size:19px;line-height:1.35}
+.qr{border-top:2px dashed var(--line);margin-top:14px;padding-top:10px;text-align:center}
+.qr .lbl{font-size:15px;color:var(--muted);font-weight:700}
+.qr .ay{font-family:var(--ar);direction:rtl;font-size:clamp(24px,5.8vw,32px);line-height:2.1}
+.qr .ay .tk.key{background:var(--hl);border-radius:10px;padding:0 3px}
+.qr .ay .tk.on{color:var(--word-deep)}
+.qr .ten{color:var(--muted);font-size:16px}
+.count{display:inline-block;margin-top:8px;background:var(--word-soft);color:var(--word-deep);border-radius:999px;padding:2px 12px;font-weight:700;font-size:15px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px}
+
+/* quiz */
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.qopt{background:var(--card);border-radius:24px;padding:10px;box-shadow:0 5px 0 var(--line);border:4px solid transparent;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:120px;justify-content:center}
+.qopt img{width:min(96px,24vw);height:min(96px,24vw)}
+.qopt .cal{width:min(96px,24vw);height:min(96px,24vw)} .qopt .cal span{font-size:30px;margin-top:.3em}
+.qopt .lb{font-weight:700;font-size:16px;line-height:1.15;color:var(--ink)}
+.qopt .arw{font-family:var(--ar);font-size:clamp(34px,9vw,46px);line-height:1.9;color:var(--word-deep)}
+.qopt.ok{border-color:var(--good);background:var(--good-soft)}
+.qopt.no{border-color:var(--bad);background:var(--bad-soft)}
+.qopt:disabled{cursor:default}
+.qhead{text-align:center}
+.qhead .mean{margin-top:10px}
+
+/* end */
+.end{text-align:center;padding:24px 16px}
+.end .trophy{width:130px;height:130px}
+.end h2{font-size:34px;font-weight:800;margin-top:6px}
+.end .st{display:flex;justify-content:center;gap:6px;margin:10px 0}
+.end .st img{width:56px;height:56px}
+.end .st img.off{filter:grayscale(1);opacity:.25}
+canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:9;width:100%;height:100%}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:16px;padding:10px 16px;font-size:16px;z-index:8;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="cf"></canvas>
+<div class="wrap" id="app"></div>
+<div id="toastw"></div>
+
+<script src="icons.js"></script>
+<script src="data.js"></script>
+<script>
+const {surahs:S, words:W} = window.HSQ, IC = window.ICONS;
+S.forEach(s => s.v.forEach(v => v.en = v.en.replace(/"/g,'')));
+const byId = {}; S.forEach(s => byId[s.id] = s);
+const $ = (q, r=document) => r.querySelector(q);
+const $$ = (q, r=document) => [...r.querySelectorAll(q)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const ic = (k, cls='ic') => `<img class="${cls}" src="${IC[k]}" alt="">`;
+const APP_VERSION = '1.0.0';
+const app = $('#app');
+/* DoJahaan mark: a bridge carrying you across the gap between two cliffs (two worlds), under a guiding star */
+const LOGO = `<svg viewBox="0 0 100 100" aria-hidden="true">
+  <defs><clipPath id="djc"><circle cx="50" cy="50" r="48"/></clipPath>
+    <linearGradient id="djs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CDEBFA"/><stop offset="1" stop-color="#F3FAFE"/></linearGradient>
+    <linearGradient id="djv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FB8D6"/><stop offset="1" stop-color="#2D6E8E"/></linearGradient></defs>
+  <g clip-path="url(#djc)">
+    <rect width="100" height="100" fill="url(#djs)"/>
+    <rect x="20" y="58" width="60" height="42" fill="url(#djv)"/>
+    <path d="M0 100V52l8-3 7 2 7-1 6 3 3 47z" fill="#12836E"/>
+    <path d="M0 52l8-3 7 2 7-1 6 3v5l-6-2-7 1-7-2-8 3z" fill="#0B5C4E"/>
+    <path d="M31 100l-3-47 2 18-4 10 3 19z" fill="#0B5C4E" opacity=".5"/>
+    <path d="M100 100V52l-8-3-7 2-7-1-6 3-3 47z" fill="#EE7D1E"/>
+    <path d="M100 52l-8-3-7 2-7-1-6 3v5l6-2 7 1 7-2 8 3z" fill="#A84F06"/>
+    <path d="M30 59Q50 84 70 59" fill="none" stroke="#1B3140" stroke-width="4" stroke-linecap="round"/>
+    <g stroke="#1B3140" stroke-width="2.4" stroke-linecap="round"><path d="M37 56v11M43.5 56v15M50 56v16M56.5 56v15M63 56v11"/></g>
+    <rect x="24" y="51.5" width="52" height="5.5" rx="2" fill="#1B3140"/>
+    <g transform="translate(50 26)" fill="#F4B400"><rect x="-8" y="-8" width="16" height="16" rx="1"/><rect x="-8" y="-8" width="16" height="16" rx="1" transform="rotate(45)"/><circle r="4.5" fill="#FFF3C4"/></g>
+  </g>
+  <circle cx="50" cy="50" r="48" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+</svg>`;
+const LEVEL = 9;
+const LEVELS = Array.from({length: Math.ceil(W.length/LEVEL)}, (_,i) => W.slice(i*LEVEL, i*LEVEL+LEVEL));
+const isWord = t => /[ء-يٱ-ۓ]/.test(t);
+
+/* ---------- saved progress (this device) ---------- */
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('hsq2.'+k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('hsq2.'+k, JSON.stringify(v)); }catch(e){} }
+};
+let P = store.get('p', {h:{}, w:{}});
+const save = () => store.set('p', P);
+const hp = id => { const p = P.h[id] || (P.h[id] = {l:0, r:0, z:0}); if (!p.weak) p.weak = []; return p; };   // listen, recite, puzzle, weak = ayahs to practice
+const weakOf = id => ((P.h[id]||{}).weak || []).slice().sort((a,b)=>a-b);
+const reciteDone = id => { const p = P.h[id]||{}; return !!(p.done || (p.r||0)>=3) && !(p.weak||[]).length; };
+const totalWeak = () => S.reduce((a,s)=>a+weakOf(s.id).length,0);
+const wp = i => P.w[i] || (P.w[i] = {c:0, q:0});          // cards seen, quiz stars
+const surahStars = id => { const p = P.h[id]||{}; return (p.l?1:0) + (reciteDone(id)?1:0) + (p.z?1:0); };
+const levelStars = i => (P.w[i]||{}).q || 0;
+const totalStars = () => S.reduce((a,s)=>a+surahStars(s.id),0) + LEVELS.reduce((a,_,i)=>a+levelStars(i),0);
+const starRow = (n, max=3) => `<div class="mini">${Array.from({length:max},(_,i)=>`<img src="${IC.star}" class="${i<n?'':'off'}" alt="">`).join('')}</div>`;
+
+/* ---------- audio ---------- */
+const player = new Audio(); player.preload = 'auto';
+let stopTimer = null, onTick = null, raf = 0, playToken = 0;
+function stopAll(){
+  playToken++; player.pause(); clearTimeout(stopTimer); cancelAnimationFrame(raf); onTick = null;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  $$('.spk.playing').forEach(b=>b.classList.remove('playing'));
+}
+function playSrc(src, {from=0, to=null, tick=null}={}){
+  stopAll(); const tok = playToken;
+  return new Promise(res => {
+    const go = () => {
+      if (tok !== playToken) return;
+      try { if (from) player.currentTime = from; } catch(e){}
+      player.play().catch(()=>res(false));
+      onTick = tick;
+      const loop = () => { if (tok!==playToken) return; if (onTick) onTick(player.currentTime);
+        if (to!==null && player.currentTime >= to){ player.pause(); res(true); return; }
+        raf = requestAnimationFrame(loop); };
+      raf = requestAnimationFrame(loop);
+    };
+    player.onended = () => { if (tok===playToken){ if (onTick) onTick(1e9); res(true); } };
+    player.onerror = () => { if (tok===playToken) res(false); };
+    player.addEventListener('loadedmetadata', go, {once:true});
+    player.src = src; player.load();
+  });
+}
+const ayahSrc = (sid, a) => `a/${String(sid).padStart(3,'0')}_${String(a).padStart(3,'0')}.mp3`;
+const wordSrc = w => `w/${w.k}.mp3`;
+
+let voice = null;
+function pickVoice(){
+  try{
+    const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+    voice = vs.find(v=>/Samantha|Google US English|Aria|Jenny|Natural/i.test(v.name)) || vs.find(v=>/en-US/i.test(v.lang)) || vs[0] || null;
+  }catch(e){}
+}
+try{ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }catch(e){}
+const canSpeak = typeof speechSynthesis !== 'undefined';
+function speak(text, keep=false){
+  return new Promise(res => {
+    if (!canSpeak){ res(false); return; }
+    if (!keep) stopAll();
+    try{
+      const u = new SpeechSynthesisUtterance(text);
+      if (voice) u.voice = voice; u.lang = voice ? voice.lang : 'en-US'; u.rate = .88; u.pitch = 1.08;
+      u.onend = () => res(true); u.onerror = () => res(false);
+      speechSynthesis.speak(u);
+      setTimeout(()=>res(false), 12000);
+    }catch(e){ res(false); }
+  });
+}
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+
+/* tiny effects */
+let actx;
+function tone(fs, d=.09){ try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); fs.forEach((f,i)=>{ const o=actx.createOscillator(), g=actx.createGain(), t=actx.currentTime+i*d; o.type='triangle'; o.frequency.value=f; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.15,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+d*1.8); o.connect(g).connect(actx.destination); o.start(t); o.stop(t+d*2); }); }catch(e){} }
+const ding = () => tone([660,880,1175]); const bonk = () => tone([240,190],.12);
+function confetti(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c=$('#cf'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight;
+  const cols=['#F4B400','#12836E','#EE7D1E','#1E9E5A','#59B7E8'];
+  const ps=Array.from({length:140},()=>({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*14,vy:Math.random()*-11-3,r:Math.random()*7+4,c:cols[Math.floor(Math.random()*5)],a:Math.random()*6}));
+  let f=0;(function st(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.a+=.2;x.fillStyle=p.c;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6);x.restore();});if(++f<120)requestAnimationFrame(st);else x.clearRect(0,0,c.width,c.height);})();
+}
+function toast(t){ $('#toastw').innerHTML = `<div class="toast">${esc(t)}</div>`; setTimeout(()=>$('#toastw').innerHTML='', 3500); }
+
+/* ---------- art ---------- */
+const STAR8 = `<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#F4B400" stroke-width="2"><rect x="18" y="18" width="64" height="64"/><rect x="18" y="18" width="64" height="64" transform="rotate(45 50 50)"/><circle cx="50" cy="50" r="22"/></g></svg>`;
+function art(w, cls=''){
+  if (w.pic) return `<img src="${w.pic}" alt="">`;
+  return `<div class="cal ${cls}" style="width:100%;height:100%">${STAR8}<span>${esc(w.ar)}</span></div>`;
+}
+
+/* ---------- token rendering ---------- */
+function tokensHTML(toks, extra=()=>''){
+  let wi = -1;
+  return toks.map(t => { if (isWord(t)){ wi++; return `<span class="tk" data-w="${wi}"${extra(wi)}>${esc(t)}</span>`; } return `<span class="mk">${esc(t)}</span>`; }).join(' ');
+}
+
+/* ---------- router ---------- */
+function header(title, sub, backFn){
+  return `<div class="bar">${backFn?`<button class="back" id="back" aria-label="Back">‹</button>`:''}
+    <div class="crumb"><small>${esc(sub||'')}</small><b>${esc(title)}</b></div>
+    <div class="stars" title="Stars earned on this device">${ic('star')}<span>${totalStars()}</span></div></div>`;
+}
+function bindBack(fn){ const b=$('#back'); if (b) b.onclick = () => { stopAll(); fn(); }; }
+function show(html, backFn, cls=''){ stopAll(); app.className = 'wrap '+cls; app.innerHTML = html; if (backFn) bindBack(backFn); scrollTo(0,0); }
+
+/* ---------- HOME ---------- */
+function home(){
+  const hs = S.reduce((a,s)=>a+surahStars(s.id),0), hmax = S.length*3;
+  const ws = LEVELS.reduce((a,_,i)=>a+levelStars(i),0), wmax = LEVELS.length*3;
+  show(`
+    <div class="bar" style="justify-content:flex-end"><div class="stars">${ic('star')}<span>${totalStars()}</span></div></div>
+    <div class="hero">
+      <div class="logocard"><img src="logo.webp" alt="DoJahaan Bridge: learning between two worlds" width="720" height="701"></div>
+      <p><b>Hifz Bridge</b> · Surahs 99 to 114 · Juz ʿAmma</p></div>
+    <div class="doors">
+      <button class="door h" id="goH">${ic('book','big')}<h2>Memorize Surahs</h2><p>Listen, recite, and put the ayahs in order.</p>
+        <div class="pl">${hs} of ${hmax} stars${totalWeak()?` · ${totalWeak()} ayah${totalWeak()>1?'s':''} to practice`:''}</div><div class="prog"><i style="width:${hs/hmax*100}%"></i></div></button>
+      <button class="door w" id="goW">${ic('words','big')}<h2>Learn Words</h2><p>${W.length} key words with pictures, starting with the ones you hear most.</p>
+        <div class="pl">${ws} of ${wmax} stars</div><div class="prog"><i style="width:${ws/wmax*100}%"></i></div></button>
+    </div>
+    <p class="credits">Indo-Pak Quran text and font by QuranWBW.com (Ayman Siddiqui &amp; R. Siddiqua). Recitation: Mishary Rashid Alafasy. Word timings: quran-align by Collin Fair (CC BY 4.0). Pictures: Microsoft Fluent Emoji. Ayah meanings: Saheeh International. Stars are saved in this browser.</p>
+    <p class="credits legal">Hifz Bridge is part of DoJahaan. It supports your Quran learning but does not replace a Quran teacher. Version ${APP_VERSION}.</p>`);
+  $('#goH').onclick = surahList; $('#goW').onclick = levelList;
+}
+
+/* ---------- MEMORIZE ---------- */
+function surahList(){
+  show(header('Memorize Surahs','Home',true) + `
+    <p class="intro">Pick a surah. Each one has 3 steps, and each step earns a star. A red badge means some ayahs still need practice.</p>
+    <div class="grid">${S.map(s=>`<button class="scard" data-s="${s.id}"><span class="num">${s.id}</span><span class="an">${esc(s.ar)}</span><span class="tr">${esc(s.tr)}</span><span class="en">${esc(s.en)} · ${s.v.length} ayahs</span>${starRow(surahStars(s.id))}${weakOf(s.id).length?`<span class="wbadge">${ic('repeat')} ${weakOf(s.id).length} to practice</span>`:''}</button>`).join('')}</div>`, home);
+  $$('.scard').forEach(b => b.onclick = () => surahHome(+b.dataset.s));
+}
+function surahHome(id){
+  const s = byId[id], p = hp(id);
+  const stp = (k, n, icon, t, d, done) => `<button class="step" data-k="${k}">${ic(icon,'big')}<h3>${n}. ${t}</h3><span class="n ${done?'done':''}">${done?ic('star'):n}</span><p>${d}</p></button>`;
+  show(header(s.tr, 'Memorize Surahs', true) + `
+    <div class="stage" style="text-align:center;margin-bottom:16px;padding:10px 16px">
+      <div class="an ar" style="font-size:52px;line-height:1.7;color:var(--hifz-deep)">${esc(s.ar)}</div>
+      <div style="color:var(--muted);font-weight:600">Surah ${s.id} · ${esc(s.en)} · ${s.v.length} ayahs</div></div>
+    <div class="steps">
+      ${stp('l',1,'listen','Listen & follow','Hear Mishary Alafasy recite. Watch each word light up.', p.l)}
+      ${stp('r',2,'mic','Your turn', weakOf(id).length ? 'Clear the ayahs below to earn this star.' : (reciteDone(id) ? 'Every ayah cleared. Say it again any time!' : 'Say each ayah from memory. Get them all to earn the star.'), reciteDone(id))}
+      ${weakPanel(id)}
+      ${stp('z',3,'puzzle','Ayah puzzle','Tap the ayahs in the right order.', p.z)}
+    </div>`, surahList);
+  $$('.step').forEach(b => b.onclick = () => ({l:listenStep, r:reciteStep, z:puzzleStep})[b.dataset.k](id));
+  bindWeak(id);
+}
+/* practice list: ayahs marked "Needed help" stay here until recited correctly */
+function weakPanel(id){
+  const wk = weakOf(id), s = byId[id];
+  if (!wk.length) return '';
+  return `<div class="weak"><div class="wh">${ic('repeat')} Ayahs to practice <span>${wk.length}</span></div>
+    <p>These were marked “Needed help”. Say each one correctly to clear it.</p>
+    <div class="wlist">${wk.map(a=>`<button class="wchip" data-a="${a}"><b>Ayah ${a}</b><span class="ar">${esc(s.v[a-1].t.filter(isWord).slice(0,3).join(' '))}…</span></button>`).join('')}</div>
+    <div class="big-btns" style="margin-top:10px"><button class="btn" id="pw">${ic('mic')} Practice ${wk.length===1?'this ayah':'these '+wk.length+' ayahs'}</button></div></div>`;
+}
+function bindWeak(id){
+  $$('.wchip').forEach(b => b.onclick = () => reciteStep(id, [+b.dataset.a]));
+  const pw = $('#pw'); if (pw) pw.onclick = () => reciteStep(id, weakOf(id));
+}
+
+/* Step 1: listen & follow */
+function listenStep(id){
+  const s = byId[id]; let i = 0, playing = false, reps = store.get('reps', 1), showMean = store.get('mean', true), rep = 0;
+  show(header('Listen & follow', s.tr, true) + `
+    <div class="stage">
+      <div class="prog2" id="dots"></div>
+      <div class="ayahbig" id="ay"></div>
+      <div class="meaning" id="mn"></div>
+      <div class="ctrls">
+        <button class="round" id="pv" aria-label="Previous ayah">⏮</button>
+        <button class="round main" id="pl" aria-label="Play">▶</button>
+        <button class="round" id="nx" aria-label="Next ayah">⏭</button>
+      </div>
+      <div class="opts">
+        <span class="pill">Repeat each ayah</span>
+        ${[1,3,5].map(n=>`<button class="chip ${reps===n?'on':''}" data-r="${n}">${n}×</button>`).join('')}
+        <button class="chip ${showMean?'on':''}" id="mt">Meaning</button>
+      </div>
+    </div>`, () => surahHome(id));
+  const draw = () => {
+    $('#dots').innerHTML = s.v.map((_,k)=>`<i class="${k<i?'g':k===i?'c':''}"></i>`).join('');
+    $('#ay').innerHTML = tokensHTML(s.v[i].t);
+    $('#mn').innerHTML = showMean ? `<span>${i+1}. ${esc(s.v[i].en)}</span>` : '';
+    $('#pl').textContent = playing ? '⏸' : '▶';
+  };
+  const hi = t => { const wt = s.v[i].wt; $$('#ay .tk').forEach(el => { const k=+el.dataset.w; el.classList.toggle('on', t>=wt[k][0] && t<wt[k][1]); el.classList.toggle('past', t>=wt[k][1]); }); };
+  async function run(){
+    playing = true; draw();
+    while (playing){
+      const tok = playToken + 1;
+      const ok = await playSrc(ayahSrc(id, i+1), {tick: hi});
+      if (!playing || playToken !== tok) return;
+      if (!ok){ playing=false; draw(); toast('Audio could not play. Tap ▶ to try again.'); return; }
+      await wait(500);
+      if (!playing) return;
+      rep++;
+      if (rep < reps) continue;
+      rep = 0;
+      if (i < s.v.length-1){ i++; draw(); }
+      else { playing = false; hp(id).l = 1; save(); draw(); doneStep(id, 'Listen & follow', 3, () => listenStep(id)); return; }
+    }
+  }
+  $('#pl').onclick = () => { if (playing){ playing=false; stopAll(); draw(); } else { rep=0; run(); } };
+  $('#pv').onclick = () => { playing=false; stopAll(); i=Math.max(0,i-1); rep=0; draw(); run(); };
+  $('#nx').onclick = () => { playing=false; stopAll(); i=Math.min(s.v.length-1,i+1); rep=0; draw(); run(); };
+  $$('[data-r]').forEach(b => b.onclick = () => { reps=+b.dataset.r; store.set('reps',reps); $$('[data-r]').forEach(x=>x.classList.toggle('on',x===b)); });
+  $('#mt').onclick = () => { showMean=!showMean; store.set('mean',showMean); $('#mt').classList.toggle('on',showMean); draw(); };
+  draw();
+}
+
+/* Step 2: your turn (whole surah, or just the ayahs on the practice list) */
+function reciteStep(id, only=null){
+  const s = byId[id], list = only && only.length ? only.slice() : s.v.map((_,k)=>k+1);
+  const practice = !!(only && only.length);
+  let j = 0; const res = {};
+  const screen = () => {
+    const a = list[j], i = a-1, p = hp(id), wasWeak = p.weak.includes(a);
+    const prev = i>0 ? `<div class="prev">${esc(s.v[i-1].t.join(' '))}</div>` : `<div class="prev" style="font-size:34px;opacity:1;color:var(--hifz-deep)">${esc(s.ar)}</div>`;
+    show(header(practice ? 'Practice ayahs' : 'Your turn', s.tr, true) + `
+      <div class="stage">
+        <div class="prog2">${list.map((x,k)=>`<i class="${k<j?(res[x]?'g':'b'):k===j?'c':''}"></i>`).join('')}</div>
+        ${wasWeak ? `<div class="flag">${ic('repeat')} On your practice list</div>` : ''}
+        ${prev}
+        <p class="say">${i===0?'Start the surah! Say ayah 1':'Now say ayah '+a} ${ic('mic')}</p>
+        <div class="ayahbig hidden" id="ay">${tokensHTML(s.v[i].t)}</div>
+        <div class="big-btns" id="b1">
+          <button class="btn soft" id="hint">${ic('bulb')} Hint</button>
+          <button class="btn" id="chk">${ic('listen')} Check</button>
+        </div>
+        <div class="big-btns" id="b2" hidden>
+          <button class="btn gold" id="yes">${ic('star')} I got it!</button>
+          <button class="btn soft" id="no">${ic('repeat')} Needed help</button>
+        </div>
+        <div id="note"></div>
+      </div>`, () => surahHome(id));
+    const wt = s.v[i].wt;
+    const playAyah = () => playSrc(ayahSrc(id,a), {tick: t => $$('#ay .tk').forEach(el => { const k=+el.dataset.w; el.classList.toggle('on', t>=wt[k][0] && t<wt[k][1]); })});
+    $('#hint').onclick = () => {
+      const n = Math.min(2, wt.length);
+      $$('#ay .tk').forEach(el => { if (+el.dataset.w < n) el.classList.add('peek'); });
+      playSrc(ayahSrc(id,a), {to: wt[n-1][1] + .05});
+    };
+    $('#chk').onclick = () => { $('#ay').classList.remove('hidden'); $('#b1').hidden = true; $('#b2').hidden = false; playAyah(); };
+    const go = () => { j++; if (j < list.length) screen(); else finish(); };
+    $('#yes').onclick = () => {
+      res[a] = true; ding();
+      if (wasWeak){ p.weak = p.weak.filter(x=>x!==a); save(); toast(`Ayah ${a} cleared from your practice list!`); }
+      go();
+    };
+    $('#no').onclick = () => {
+      res[a] = false; bonk();
+      if (!wasWeak){ p.weak.push(a); save(); }
+      // show what to practice before moving on
+      $('#b2').hidden = true;
+      $('#note').innerHTML = `<div class="ex" style="margin-top:14px"><span>${ic('repeat')} Ayah ${a} ${wasWeak?'stays':'is now'} on your practice list. Listen once more and say it along with the Qari.</span></div>
+        <div class="big-btns"><button class="btn soft" id="again">${ic('listen')} Hear it again</button><button class="btn" id="go">${j<list.length-1?'Next ayah ›':'Finish'}</button></div>`;
+      $('#again').onclick = playAyah; $('#go').onclick = go;
+      playAyah();
+    };
+  };
+  const finish = () => {
+    const p = hp(id);
+    if (!practice) p.done = 1;
+    const wk = weakOf(id), n = list.length, good = list.filter(x=>res[x]).length;
+    const st = !wk.length && p.done ? 3 : (good/n >= .7 ? 2 : 1);
+    save();
+    const title = !wk.length ? (p.done ? 'All ayahs cleared!' : 'Cleared!') : 'Keep going!';
+    show(header(practice ? 'Practice ayahs' : 'Your turn', s.tr, true) + `
+      <div class="stage end">${ic(wk.length?'repeat':'trophy','trophy')}<h2>${title}</h2>
+        <div class="st">${Array.from({length:3},(_,k)=>`<img src="${IC.star}" class="${k<st?'':'off'}" alt="">`).join('')}</div>
+        <p style="color:var(--muted);margin:0">${good} of ${n} ayah${n>1?'s':''} from memory this time.</p>
+        ${wk.length ? `<p style="margin:10px 0 0;font-weight:700">The full star unlocks when the practice list is empty.</p>` : (p.done ? `<p style="margin:10px 0 0;font-weight:700">${ic('star')} Your turn star earned for ${esc(s.tr)}!</p>` : `<p style="margin:10px 0 0;font-weight:700">Now say the whole surah once to earn the star.</p>`)}
+      </div>
+      ${weakPanel(id)}
+      <div class="big-btns">${!wk.length && !p.done ? `<button class="btn" id="full">${ic('mic')} Say the whole surah</button>` : ''}<button class="btn soft" id="bk">Back to ${esc(s.tr)}</button></div>`, () => surahHome(id));
+    bindWeak(id);
+    if (!wk.length && p.done) confetti();
+    const f = $('#full'); if (f) f.onclick = () => reciteStep(id);
+    $('#bk').onclick = () => surahHome(id);
+  };
+  screen();
+}
+
+/* Step 3: puzzle (in chunks of up to 5 ayahs) */
+function puzzleStep(id){
+  const s = byId[id], N = s.v.length, chunks = [];
+  for (let k=0; k<N; k+=5) chunks.push([k, Math.min(N, k+5)]);
+  if (chunks.length>1 && chunks[chunks.length-1][1]-chunks[chunks.length-1][0] < 2){ const last=chunks.pop(); chunks[chunks.length-1][1]=last[1]; }
+  let c = 0, slips = 0;
+  const screen = () => {
+    const [a,b] = chunks[c], lines = s.v.slice(a,b).map((v,k)=>({t:v.t.filter(isWord).join(' '), n:a+k+1}));
+    let pos = 0; const cards = shuffle(lines);
+    show(header('Ayah puzzle', s.tr, true) + `
+      <div class="stage">
+        <div class="prog2">${chunks.map((_,k)=>`<i class="${k<c?'g':k===c?'c':''}"></i>`).join('')}</div>
+        <p class="say">Tap ayah ${a+1} first ${ic('puzzle')}</p>
+        <div class="slots" id="slots"><div class="ph">Your ayahs line up here</div></div>
+        <div class="pile">${cards.map((l,k)=>`<button class="piece" data-k="${k}">${esc(l.t)}</button>`).join('')}</div>
+      </div>`, () => surahHome(id));
+    $$('.piece').forEach(btn => btn.onclick = () => {
+      const card = cards[+btn.dataset.k];
+      if (card.t === lines[pos].t){
+        const ph = $('.slots .ph'); if (ph) ph.remove();
+        $('#slots').insertAdjacentHTML('beforeend', `<div class="ln">${esc(card.t)}</div>`);
+        btn.remove(); playSrc(ayahSrc(id, lines[pos].n)); pos++;
+        $('.say').innerHTML = pos<lines.length ? `Now ayah ${a+pos+1} ${ic('puzzle')}` : `MashaAllah! ${ic('party')}`;
+        if (pos === lines.length){
+          ding(); setTimeout(() => { c++; if (c < chunks.length) screen(); else { const st = slips<=1?3:slips<=4?2:1; hp(id).z = 1; save(); doneStep(id,'Ayah puzzle',st,()=>puzzleStep(id), slips? `${slips} wrong tap${slips>1?'s':''}`:'No wrong taps!'); } }, 1600);
+        }
+      } else { slips++; bonk(); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); }
+    });
+  };
+  screen();
+}
+
+function doneStep(id, name, st, again, note=''){
+  show(header(name, byId[id].tr, true) + `
+    <div class="stage end">${ic('trophy','trophy')}<h2>${st===3?'MashaAllah!':st>=2?'Great job!':'Good practice!'}</h2>
+      <div class="st">${Array.from({length:3},(_,k)=>`<img src="${IC.star}" class="${k<st?'':'off'}" alt="">`).join('')}</div>
+      <p style="color:var(--muted);margin:0">${esc(note)}</p>
+      <div class="big-btns"><button class="btn" id="nx">Next step</button><button class="btn soft" id="ag">Again</button></div></div>`, () => surahHome(id));
+  if (st>=2) confetti();
+  $('#nx').onclick = () => surahHome(id); $('#ag').onclick = again;
+}
+
+/* ---------- WORDS ---------- */
+function levelList(){
+  show(header('Learn Words','Home',true) + `
+    <p class="intro">Level 1 has the words you hear most in these 16 surahs. Each level has ${LEVEL} words.</p>
+    <div class="list">${LEVELS.map((L,i)=>`<button class="lcard" data-l="${i}"><span class="lv">${i+1}</span><h3>Level ${i+1}</h3>${starRow(levelStars(i))}
+      <div class="pics">${L.map(w=>w.pic?`<img src="${w.pic}" alt="">`:`<div class="cal" style="width:30px;height:30px;font-size:11px">${STAR8}</div>`).join('')}</div></button>`).join('')}</div>`, home, 'w');
+  $$('.lcard').forEach(b => b.onclick = () => levelHome(+b.dataset.l));
+}
+function levelHome(li){
+  const L = LEVELS[li], p = wp(li);
+  show(header(`Level ${li+1}`, 'Learn Words', true) + `
+    <div class="stage" style="margin-bottom:16px"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px">
+      ${L.map(w=>`<div style="text-align:center"><div style="width:56px;height:56px;margin:0 auto">${art(w)}</div><div class="ar" style="font-size:22px;line-height:1.9;color:var(--word-deep)">${esc(w.ar)}</div></div>`).join('')}
+    </div></div>
+    <div class="steps">
+      <button class="step" data-k="c">${ic('cards','big')}<h3>1. Word cards</h3><span class="n ${p.c?'done':''}">${p.c?ic('star'):1}</span><p>See the picture, hear the word, learn what it means.</p></button>
+      <button class="step" data-k="q">${ic('target','big')}<h3>2. Listen & pick</h3><span class="n ${p.q?'done':''}">${p.q?ic('star'):2}</span><p>Hear a word and tap the right picture.</p></button>
+    </div>`, levelList, 'w');
+  $$('.step').forEach(b => b.onclick = () => b.dataset.k==='c' ? cardsStep(li) : quizStep(li));
+}
+
+async function sayWord(w, btn){
+  if (btn) btn.classList.add('playing');
+  await playSrc(wordSrc(w));
+  if (btn) btn.classList.remove('playing');
+}
+async function sayMeaning(w, btn){ if (btn) btn.classList.add('playing'); await speak(`${w.tr} means ${w.m.replace(/;/g,',')}`); if (btn) btn.classList.remove('playing'); }
+async function saySentence(w, btn){ if (btn) btn.classList.add('playing'); await speak(w.x); if (btn) btn.classList.remove('playing'); }
+
+function cardsStep(li){
+  const L = LEVELS[li]; let i = 0, auto = store.get('auto', true);
+  const screen = () => {
+    const w = L[i], s = byId[w.s], v = s.v[w.a-1];
+    show(header('Word cards', `Level ${li+1}`, true) + `
+      <div class="prog2">${L.map((_,k)=>`<i class="${k<i?'g':k===i?'c':''}"></i>`).join('')}</div>
+      <div class="wcard">
+        <div class="art ${w.pic?'':'cal'}">${w.pic?`<img src="${w.pic}" alt="">`:`${STAR8}<span>${esc(w.ar)}</span>`}</div>
+        <div class="wbig"><span>${esc(w.ar)}</span><button class="spk" id="sa" aria-label="Hear the Arabic word">${ic('speaker','')}</button></div>
+        <div class="trn">${esc(w.tr)}</div>
+        <div class="mean"><span>${esc(w.m)}</span>${canSpeak?`<button class="spk sm" id="sm" aria-label="Hear the meaning">${ic('speaker','')}</button>`:''}</div>
+        <span class="count">Heard ${w.n} time${w.n>1?'s':''} in these surahs</span>
+        <div class="ex">${canSpeak?`<button class="spk sm" id="sx" aria-label="Hear the sentence">${ic('speaker','')}</button>`:''}<span>${esc(w.x)}</span></div>
+        <div class="qr"><div class="lbl">In the Quran · ${esc(s.tr)}, ayah ${w.a}</div>
+          <div class="ay" id="qay">${tokensHTML(v.t, k => k===w.w-1 ? ' data-key="1"' : '')}</div>
+          <div class="ten">“${esc(v.en)}”</div>
+          <div class="big-btns" style="margin-top:8px"><button class="btn or" id="pa" style="font-size:18px;padding:8px 18px">▶ Hear the ayah</button></div></div>
+      </div>
+      <div class="nav">
+        <button class="btn soft" id="pv" aria-label="Previous word" ${i===0?'disabled style="opacity:.4"':''}>‹</button>
+        <label class="pill"><input type="checkbox" id="au" ${auto?'checked':''}> Auto sound</label>
+        <button class="btn or" id="nx">${i===L.length-1?'Done ✓':'Next ›'}</button>
+      </div>`, () => levelHome(li), 'w');
+    $$('#qay .tk[data-key]').forEach(el => el.classList.add('key'));
+    $('#sa').onclick = () => sayWord(w, $('#sa'));
+    if ($('#sm')) $('#sm').onclick = () => sayMeaning(w, $('#sm'));
+    if ($('#sx')) $('#sx').onclick = () => saySentence(w, $('#sx'));
+    $('#pa').onclick = () => playSrc(ayahSrc(w.s, w.a), {tick: t => $$('#qay .tk').forEach(el => { const k=+el.dataset.w; el.classList.toggle('on', t>=v.wt[k][0] && t<v.wt[k][1]); })});
+    $('#au').onchange = e => { auto = e.target.checked; store.set('auto', auto); };
+    $('#pv').onclick = () => { if (i>0){ i--; screen(); } };
+    $('#nx').onclick = () => { if (i < L.length-1){ i++; screen(); } else { wp(li).c = 1; save(); levelHome(li); toast('Cards done! Now try Listen & pick.'); } };
+    if (auto){ (async () => { const tok = playToken; await sayWord(w, $('#sa')); await wait(350); if (playToken === tok+1 && canSpeak) sayMeaning(w, $('#sm')); })(); }
+  };
+  screen();
+}
+
+function quizStep(li){
+  const L = LEVELS[li], qs = shuffle(L).map((w,k) => ({w, type: k%3===2 ? 'read' : 'hear'}));
+  let i = 0, score = 0;
+  const others = w => shuffle(L.filter(x => x.k !== w.k)).slice(0,2).concat(shuffle(W.filter(x => !L.includes(x))).slice(0,1));
+  const screen = () => {
+    const q = qs[i], w = q.w, opts = shuffle([w, ...others(w)]);
+    const hear = q.type === 'hear';
+    show(header('Listen & pick', `Level ${li+1}`, true) + `
+      <div class="prog2">${qs.map((_,k)=>`<i class="${k<i?'g':k===i?'c':''}"></i>`).join('')}</div>
+      <div class="wcard">
+        <div class="qhead">
+          ${hear ? `<p class="say">Listen! Which picture is it?</p><button class="spk" id="sa" style="width:96px;height:96px;margin:0 auto" aria-label="Hear the word again"><img src="${IC.speaker}" style="width:56px;height:56px" alt=""></button>`
+                 : `<p class="say">What does this word mean?</p><div class="wbig" style="justify-content:center"><span>${esc(w.ar)}</span><button class="spk" id="sa" aria-label="Hear the word">${ic('speaker','')}</button></div>`}
+        </div>
+        <div class="qgrid">${opts.map(o=>`<button class="qopt" data-k="${o.k}"><div style="width:min(96px,24vw);height:min(96px,24vw)">${art(o)}</div><span class="lb">${esc(o.m.split(/[;,(]/)[0])}</span></button>`).join('')}</div>
+        <div id="fb"></div>
+      </div>`, () => levelHome(li), 'w');
+    $('#sa').onclick = () => sayWord(w, $('#sa'));
+    if (hear) sayWord(w, $('#sa'));
+    $$('.qopt').forEach(b => b.onclick = async () => {
+      const ok = b.dataset.k === w.k;
+      $$('.qopt').forEach(x => { x.disabled = true; if (x.dataset.k === w.k) x.classList.add('ok'); });
+      if (!ok) b.classList.add('no'); else score++;
+      ok ? ding() : bonk();
+      $('#fb').innerHTML = `<div class="ex" style="justify-content:center;text-align:center"><span><b class="ar" style="font-size:30px">${esc(w.ar)}</b> <b>${esc(w.tr)}</b> means <b>${esc(w.m)}</b></span></div>
+        <div class="big-btns"><button class="btn or" id="nx">${i===qs.length-1?'Finish':'Next ›'}</button></div>`;
+      $('#nx').onclick = () => { i++; if (i<qs.length) screen(); else finish(); };
+      await wait(ok?500:700);
+      await sayWord(w); await wait(250);
+      speak(`${ok?'Yes! ':''}${w.tr} means ${w.m.replace(/;/g,',')}`, true);
+    });
+  };
+  const finish = () => {
+    const n = qs.length, st = score===n?3:score>=n-2?2:score>=n/2?1:0;
+    const p = wp(li); p.q = Math.max(p.q||0, st); save();
+    show(header('Listen & pick', `Level ${li+1}`, true) + `
+      <div class="stage end">${ic('trophy','trophy')}<h2>${st===3?'Perfect!':st>=2?'Great job!':'Keep practicing!'}</h2>
+      <div class="st">${Array.from({length:3},(_,k)=>`<img src="${IC.star}" class="${k<st?'':'off'}" alt="">`).join('')}</div>
+      <p style="color:var(--muted);margin:0">${score} of ${n} right</p>
+      <div class="big-btns">${li<LEVELS.length-1?`<button class="btn or" id="nl">Level ${li+2} ›</button>`:''}<button class="btn soft" id="ag">Again</button><button class="btn soft" id="cd">Word cards</button></div></div>`, () => levelHome(li), 'w');
+    if (st>=2) confetti();
+    if ($('#nl')) $('#nl').onclick = () => levelHome(li+1);
+    $('#ag').onclick = () => quizStep(li); $('#cd').onclick = () => cardsStep(li);
+  };
+  screen();
+}
+
+home();
+</script>
+
+<script>
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
