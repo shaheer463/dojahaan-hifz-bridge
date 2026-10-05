@@ -7,6 +7,18 @@ Versions follow [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH.
 - **MINOR** (1.1.0): new features that keep everyone's saved progress, like surah stories or more words.
 - **MAJOR** (2.0.0): big changes that could reset or move saved progress, or new surah ranges.
 
+## [1.1.0] - 2026-10-05
+
+### Added
+- **Anonymous usage events** for the feedback and insights loop: app opens, every "I got it" / "Needed help" tap, practice-list changes, recite rounds, puzzle and word-quiz results (including which wrong word was picked). Events are kept on the phone while offline and sent in batches when online.
+- **Parent opt-in card** on the home screen, behind a simple parent check. Nothing is recorded unless a parent says yes. Sharing can be turned off from the link at the bottom of the home screen, which also deletes any unsent events.
+- `tools/google-apps-script.gs`: a collector that writes events to a Google Sheet you own.
+- `docs/FEEDBACK-SETUP.md`: setup steps, a list of every event, and useful pivot tables.
+
+### Notes
+- No names, recordings, typed text or location are collected. Each device gets a random anonymous ID.
+- Events are only sent once `ANALYTICS_URL` in `analytics.js` is set.
+
 ## [1.0.0] - 2026-10-04
 
 First release.

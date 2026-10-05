@@ -29,11 +29,18 @@ This is a Progressive Web App. Open it once while online, then use **Add to Home
 | `fonts/` | Indo-Pak Quran font and Baloo 2 |
 | `icons/` | App icons |
 | `sw.js` | Offline support. It saves every file on first visit. |
+| `analytics.js` | Anonymous usage events (opt-in by a parent). Set `ANALYTICS_URL` to switch on sending. |
+| `tools/google-apps-script.gs` | Collector that writes events to your Google Sheet |
+| `docs/FEEDBACK-SETUP.md` | How to set up the Sheet, what's recorded, useful pivot tables |
 | `manifest.webmanifest` | Lets phones install the app |
 
 There's no build step and no server code. Any static host works, such as Cloudflare Pages or GitHub Pages.
 
 To try it locally, run `python3 -m http.server` in this folder and open http://localhost:8000. Offline support needs http, not a double-clicked file.
+
+## Feedback and insights
+
+With a parent's permission, the app can send anonymous practice events (which ayahs needed help, quiz answers, practice days) to a Google Sheet you own. See [`docs/FEEDBACK-SETUP.md`](docs/FEEDBACK-SETUP.md).
 
 ## Versioning
 

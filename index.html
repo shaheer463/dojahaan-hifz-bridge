@@ -87,6 +87,10 @@ img.ic{width:1em;height:1em;vertical-align:-0.15em}
 .wchip .ar{font-size:22px;line-height:1.9;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .wchip:active{transform:translateY(2px);box-shadow:none}
 .flag{display:flex;justify-content:center;align-items:center;gap:6px;color:#B23A32;font-weight:800;font-size:16px;margin-bottom:4px}
+.consent{background:#fff;border:3px solid var(--hifz-soft);border-radius:22px;padding:14px 16px;margin-top:18px}
+.consent b{font-size:18px;color:var(--hifz-deep)}
+.consent p{margin:4px 0 0;font-size:16px;color:var(--ink)}
+.linkish{color:var(--hifz-deep);font-weight:800;text-decoration:underline;padding:0}
 .credits{margin-top:28px;color:var(--muted);font-size:13px;line-height:1.5}
 
 /* lists */
@@ -222,6 +226,7 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:9;width:100%;height
 
 <script src="icons.js"></script>
 <script src="data.js"></script>
+<script src="analytics.js"></script>
 <script>
 const {surahs:S, words:W} = window.HSQ, IC = window.ICONS;
 S.forEach(s => s.v.forEach(v => v.en = v.en.replace(/"/g,'')));
@@ -231,7 +236,7 @@ const $$ = (q, r=document) => [...r.querySelectorAll(q)];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
 const ic = (k, cls='ic') => `<img class="${cls}" src="${IC[k]}" alt="">`;
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const app = $('#app');
 /* DoJahaan mark: a bridge carrying you across the gap between two cliffs (two worlds), under a guiding star */
 const LOGO = `<svg viewBox="0 0 100 100" aria-hidden="true">
@@ -264,6 +269,7 @@ const store = {
 };
 let P = store.get('p', {h:{}, w:{}});
 const save = () => store.set('p', P);
+const track = (e, p) => { try { window.HB && HB.track(e, p); } catch (err) {} };
 const hp = id => { const p = P.h[id] || (P.h[id] = {l:0, r:0, z:0}); if (!p.weak) p.weak = []; return p; };   // listen, recite, puzzle, weak = ayahs to practice
 const weakOf = id => ((P.h[id]||{}).weak || []).slice().sort((a,b)=>a-b);
 const reciteDone = id => { const p = P.h[id]||{}; return !!(p.done || (p.r||0)>=3) && !(p.weak||[]).length; };
@@ -363,6 +369,34 @@ function header(title, sub, backFn){
 function bindBack(fn){ const b=$('#back'); if (b) b.onclick = () => { stopAll(); fn(); }; }
 function show(html, backFn, cls=''){ stopAll(); app.className = 'wrap '+cls; app.innerHTML = html; if (backFn) bindBack(backFn); scrollTo(0,0); }
 
+/* ---------- parent consent for anonymous usage sharing ---------- */
+function consentCard(){
+  if (!window.HB || HB.consent !== null) return '';
+  return `<div class="consent" id="consent"><b>For parents</b>
+    <p>Help improve Hifz Bridge by sharing anonymous practice data, such as which ayahs needed help and quiz scores. No names, no voice, nothing typed. You can turn it off any time.</p>
+    <div class="big-btns" style="margin-top:8px"><button class="btn" id="cy" style="font-size:18px">Yes, share</button><button class="btn soft" id="cn" style="font-size:18px">No thanks</button></div>
+    <div id="gate"></div></div>`;
+}
+function parentGate(onPass){
+  const a = 3 + Math.floor(Math.random()*6), b = 4 + Math.floor(Math.random()*5), ans = a + b;
+  const opts = shuffle([ans, ans+1, ans-2]);
+  $('#gate').innerHTML = `<p style="margin:10px 0 6px;font-weight:700">Parents: what is ${a} + ${b}?</p>
+    <div class="big-btns" style="margin-top:0">${opts.map(o=>`<button class="btn soft" data-g="${o}" style="font-size:18px;padding:8px 18px">${o}</button>`).join('')}</div>`;
+  $$('[data-g]').forEach(btn => btn.onclick = () => { if (+btn.dataset.g === ans) onPass(); else { $('#gate').innerHTML = '<p style="margin:10px 0 0">Please ask a parent to choose.</p>'; } });
+}
+function bindConsent(){
+  const yes = $('#cy'), no = $('#cn'), chg = $('#chgc');
+  if (yes) yes.onclick = () => parentGate(() => { HB.setConsent(true); track('app_open', {first: 1}); toast('Thank you! Sharing is on.'); home(); });
+  if (no) no.onclick = () => parentGate(() => { HB.setConsent(false); home(); });
+  if (chg) chg.onclick = () => {
+    $('#chgc').closest('p').insertAdjacentHTML('afterend', `<div class="consent"><b>Anonymous usage sharing</b><p>Currently ${HB.consent?'on':'off'}.</p><div class="big-btns" style="margin-top:8px"><button class="btn${HB.consent?' soft':''}" id="${HB.consent?'turnoff':'turnon'}" style="font-size:18px">${HB.consent?'Turn off':'Turn on'}</button></div><div id="gate"></div></div>`);
+    chg.remove();
+    const on = $('#turnon'), off = $('#turnoff');
+    if (on) on.onclick = () => parentGate(() => { HB.setConsent(true); home(); });
+    if (off) off.onclick = () => parentGate(() => { HB.setConsent(false); toast('Sharing is off. Nothing will be sent.'); home(); });
+  };
+}
+
 /* ---------- HOME ---------- */
 function home(){
   const hs = S.reduce((a,s)=>a+surahStars(s.id),0), hmax = S.length*3;
@@ -378,9 +412,12 @@ function home(){
       <button class="door w" id="goW">${ic('words','big')}<h2>Learn Words</h2><p>${W.length} key words with pictures, starting with the ones you hear most.</p>
         <div class="pl">${ws} of ${wmax} stars</div><div class="prog"><i style="width:${ws/wmax*100}%"></i></div></button>
     </div>
+    ${consentCard()}
     <p class="credits">Indo-Pak Quran text and font by QuranWBW.com (Ayman Siddiqui &amp; R. Siddiqua). Recitation: Mishary Rashid Alafasy. Word timings: quran-align by Collin Fair (CC BY 4.0). Pictures: Microsoft Fluent Emoji. Ayah meanings: Saheeh International. Stars are saved in this browser.</p>
-    <p class="credits legal">Hifz Bridge is part of DoJahaan. It supports your Quran learning but does not replace a Quran teacher. Version ${APP_VERSION}.</p>`);
+    <p class="credits legal">Hifz Bridge is part of DoJahaan. It supports your Quran learning but does not replace a Quran teacher. Version ${APP_VERSION}.</p>
+    ${window.HB && HB.consent !== null ? `<p class="credits">Anonymous usage sharing is <b>${HB.consent ? 'on' : 'off'}</b>. <button class="linkish" id="chgc">Change</button></p>` : ''}`);
   $('#goH').onclick = surahList; $('#goW').onclick = levelList;
+  bindConsent();
 }
 
 /* ---------- MEMORIZE ---------- */
@@ -459,7 +496,7 @@ function listenStep(id){
       if (rep < reps) continue;
       rep = 0;
       if (i < s.v.length-1){ i++; draw(); }
-      else { playing = false; hp(id).l = 1; save(); draw(); doneStep(id, 'Listen & follow', 3, () => listenStep(id)); return; }
+      else { playing = false; hp(id).l = 1; save(); track('listen_done', {surah: id}); draw(); doneStep(id, 'Listen & follow', 3, () => listenStep(id)); return; }
     }
   }
   $('#pl').onclick = () => { if (playing){ playing=false; stopAll(); draw(); } else { rep=0; run(); } };
@@ -506,12 +543,14 @@ function reciteStep(id, only=null){
     const go = () => { j++; if (j < list.length) screen(); else finish(); };
     $('#yes').onclick = () => {
       res[a] = true; ding();
-      if (wasWeak){ p.weak = p.weak.filter(x=>x!==a); save(); toast(`Ayah ${a} cleared from your practice list!`); }
+      track('ayah_result', {surah: id, ayah: a, correct: 1, practice: practice ? 1 : 0});
+      if (wasWeak){ p.weak = p.weak.filter(x=>x!==a); save(); track('practice_cleared', {surah: id, ayah: a}); toast(`Ayah ${a} cleared from your practice list!`); }
       go();
     };
     $('#no').onclick = () => {
       res[a] = false; bonk();
-      if (!wasWeak){ p.weak.push(a); save(); }
+      track('ayah_result', {surah: id, ayah: a, correct: 0, practice: practice ? 1 : 0});
+      if (!wasWeak){ p.weak.push(a); save(); track('needed_help', {surah: id, ayah: a}); }
       // show what to practice before moving on
       $('#b2').hidden = true;
       $('#note').innerHTML = `<div class="ex" style="margin-top:14px"><span>${ic('repeat')} Ayah ${a} ${wasWeak?'stays':'is now'} on your practice list. Listen once more and say it along with the Qari.</span></div>
@@ -526,6 +565,8 @@ function reciteStep(id, only=null){
     const wk = weakOf(id), n = list.length, good = list.filter(x=>res[x]).length;
     const st = !wk.length && p.done ? 3 : (good/n >= .7 ? 2 : 1);
     save();
+    track('recite_round', {surah: id, score: good, total: n, practice: practice ? 1 : 0, weak_left: wk.length, stars: st});
+    if (reciteDone(id) && !p.starLogged){ p.starLogged = 1; save(); track('recite_star', {surah: id}); }
     const title = !wk.length ? (p.done ? 'All ayahs cleared!' : 'Cleared!') : 'Keep going!';
     show(header(practice ? 'Practice ayahs' : 'Your turn', s.tr, true) + `
       <div class="stage end">${ic(wk.length?'repeat':'trophy','trophy')}<h2>${title}</h2>
@@ -567,7 +608,7 @@ function puzzleStep(id){
         btn.remove(); playSrc(ayahSrc(id, lines[pos].n)); pos++;
         $('.say').innerHTML = pos<lines.length ? `Now ayah ${a+pos+1} ${ic('puzzle')}` : `MashaAllah! ${ic('party')}`;
         if (pos === lines.length){
-          ding(); setTimeout(() => { c++; if (c < chunks.length) screen(); else { const st = slips<=1?3:slips<=4?2:1; hp(id).z = 1; save(); doneStep(id,'Ayah puzzle',st,()=>puzzleStep(id), slips? `${slips} wrong tap${slips>1?'s':''}`:'No wrong taps!'); } }, 1600);
+          ding(); setTimeout(() => { c++; if (c < chunks.length) screen(); else { const st = slips<=1?3:slips<=4?2:1; hp(id).z = 1; save(); track('puzzle_done', {surah: id, slips, stars: st}); doneStep(id,'Ayah puzzle',st,()=>puzzleStep(id), slips? `${slips} wrong tap${slips>1?'s':''}`:'No wrong taps!'); } }, 1600);
         }
       } else { slips++; bonk(); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); }
     });
@@ -644,7 +685,7 @@ function cardsStep(li){
     $('#pa').onclick = () => playSrc(ayahSrc(w.s, w.a), {tick: t => $$('#qay .tk').forEach(el => { const k=+el.dataset.w; el.classList.toggle('on', t>=v.wt[k][0] && t<v.wt[k][1]); })});
     $('#au').onchange = e => { auto = e.target.checked; store.set('auto', auto); };
     $('#pv').onclick = () => { if (i>0){ i--; screen(); } };
-    $('#nx').onclick = () => { if (i < L.length-1){ i++; screen(); } else { wp(li).c = 1; save(); levelHome(li); toast('Cards done! Now try Listen & pick.'); } };
+    $('#nx').onclick = () => { if (i < L.length-1){ i++; screen(); } else { wp(li).c = 1; save(); track('cards_done', {level: li+1}); levelHome(li); toast('Cards done! Now try Listen & pick.'); } };
     if (auto){ (async () => { const tok = playToken; await sayWord(w, $('#sa')); await wait(350); if (playToken === tok+1 && canSpeak) sayMeaning(w, $('#sm')); })(); }
   };
   screen();
@@ -671,6 +712,7 @@ function quizStep(li){
     if (hear) sayWord(w, $('#sa'));
     $$('.qopt').forEach(b => b.onclick = async () => {
       const ok = b.dataset.k === w.k;
+      track('quiz_answer', {level: li+1, word: w.k, correct: ok ? 1 : 0, type: q.type, picked: b.dataset.k});
       $$('.qopt').forEach(x => { x.disabled = true; if (x.dataset.k === w.k) x.classList.add('ok'); });
       if (!ok) b.classList.add('no'); else score++;
       ok ? ding() : bonk();
@@ -685,6 +727,7 @@ function quizStep(li){
   const finish = () => {
     const n = qs.length, st = score===n?3:score>=n-2?2:score>=n/2?1:0;
     const p = wp(li); p.q = Math.max(p.q||0, st); save();
+    track('quiz_done', {level: li+1, score, total: n, stars: st});
     show(header('Listen & pick', `Level ${li+1}`, true) + `
       <div class="stage end">${ic('trophy','trophy')}<h2>${st===3?'Perfect!':st>=2?'Great job!':'Keep practicing!'}</h2>
       <div class="st">${Array.from({length:3},(_,k)=>`<img src="${IC.star}" class="${k<st?'':'off'}" alt="">`).join('')}</div>
@@ -698,6 +741,7 @@ function quizStep(li){
 }
 
 home();
+track('app_open');
 </script>
 
 <script>
