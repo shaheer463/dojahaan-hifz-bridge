@@ -43,12 +43,24 @@ Every row has: time, event name, an anonymous random device ID, a session ID, th
 
 Nothing else is collected: no names, no recordings, no typed text, no location.
 
-## Useful views (pivot tables)
+## Insight tabs (built for you)
 
-- **Hardest ayahs:** filter `ayah_result` to `correct = 0`, with rows = surah + ayah, value = count.
-- **Retention:** filter `app_open`, with rows = device, columns = week of `t`, value = count of unique dates.
-- **Hardest words:** filter `quiz_answer`, with rows = word, value = average of `correct`.
-- **Word mix-ups:** filter `quiz_answer` to `correct = 0`, with rows = word, columns = picked.
+The same script also builds five summary tabs from the raw events, so you don't need pivot tables.
+
+1. In Apps Script, replace the code with the latest `tools/google-apps-script.gs` and click **Save**. There's no need to redeploy; the web app keeps working.
+2. Reload the Google Sheet. A **Hifz Bridge** menu appears next to Help.
+3. Click **Hifz Bridge → Refresh insights**. The first time, approve the permissions: your account, then **Advanced → Go to project**.
+4. Optional: click **Hifz Bridge → Refresh every morning** to update the tabs daily around 6am.
+
+| Tab | Shows |
+|---|---|
+| **Summary** | Families opted in, weekly active families, practice days per device, how often ayahs are recited from memory, practice ayahs cleared, stars, quiz accuracy |
+| **Hardest ayahs** | Every ayah tried, ranked by how often it needed help, with the help rate and how many families struggled with it |
+| **Hardest words** | Words ranked by lowest quiz accuracy, and which word they're most often confused with |
+| **Devices** | One row per anonymous device: first and last seen, active days, active days in the last week, ayahs recited, stars, version |
+| **Daily** | Active devices, ayahs recited, help taps and quiz answers per day |
+
+The tabs are rebuilt on each refresh, so don't type notes into them. Keep notes in a separate tab.
 
 ## Checking it works
 
