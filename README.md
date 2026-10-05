@@ -35,7 +35,18 @@ There's no build step and no server code. Any static host works, such as Cloudfl
 
 To try it locally, run `python3 -m http.server` in this folder and open http://localhost:8000. Offline support needs http, not a double-clicked file.
 
-When you change any file, raise the version in `sw.js` (the `CACHE` name) and in `index.html` (`APP_VERSION`) so phones pick up the update.
+## Versioning
+
+The current version is in [`VERSION`](VERSION) and shows in the app's footer. Every release is listed in [`CHANGELOG.md`](CHANGELOG.md) and tagged in git (`v1.0.0`, `v1.1.0`, …).
+
+To release a new version:
+
+1. Make your changes.
+2. Run `scripts/bump-version.sh 1.1.0` with the new number. This updates `VERSION`, the app footer and the offline cache name. Phones only download updated files when the cache name changes.
+3. Add a section for the new version at the top of `CHANGELOG.md`.
+4. Commit, then tag: `git tag v1.1.0 && git push --tags`.
+
+Version numbers follow MAJOR.MINOR.PATCH. See the top of the changelog for which part to raise.
 
 ## Credits
 
