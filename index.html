@@ -236,7 +236,7 @@ const $$ = (q, r=document) => [...r.querySelectorAll(q)];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
 const ic = (k, cls='ic') => `<img class="${cls}" src="${IC[k]}" alt="">`;
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.1.1';
 const app = $('#app');
 /* DoJahaan mark: a bridge carrying you across the gap between two cliffs (two worlds), under a guiding star */
 const LOGO = `<svg viewBox="0 0 100 100" aria-hidden="true">
@@ -415,7 +415,7 @@ function home(){
     ${consentCard()}
     <p class="credits">Indo-Pak Quran text and font by QuranWBW.com (Ayman Siddiqui &amp; R. Siddiqua). Recitation: Mishary Rashid Alafasy. Word timings: quran-align by Collin Fair (CC BY 4.0). Pictures: Microsoft Fluent Emoji. Ayah meanings: Saheeh International. Stars are saved in this browser.</p>
     <p class="credits legal">Hifz Bridge is part of DoJahaan. It supports your Quran learning but does not replace a Quran teacher. Version ${APP_VERSION}.</p>
-    ${window.HB && HB.consent !== null ? `<p class="credits">Anonymous usage sharing is <b>${HB.consent ? 'on' : 'off'}</b>. <button class="linkish" id="chgc">Change</button></p>` : ''}`);
+    ${window.HB && HB.consent !== null ? `<p class="credits">Anonymous usage sharing is <b>${HB.consent ? 'on' : 'off'}</b>${HB.consent && HB.queued ? ` (${HB.queued} waiting to send${HB.last && HB.last.error ? ', last try failed' : ''})` : ''}. <button class="linkish" id="chgc">Change</button></p>` : ''}`);
   $('#goH').onclick = surahList; $('#goW').onclick = levelList;
   bindConsent();
 }

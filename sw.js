@@ -1,5 +1,5 @@
 // Hifz Bridge offline support. Saves every file on first visit so the app works with no internet.
-const CACHE = 'hifz-bridge-1.1.0';
+const CACHE = 'hifz-bridge-1.1.1';
 const FILES = [
 "./",
 "index.html",

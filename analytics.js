@@ -9,8 +9,9 @@
 
   Setup: paste your Apps Script web app URL below. See docs/FEEDBACK-SETUP.md.
   While ANALYTICS_URL is empty, events are kept on the phone (up to the cap) but never sent.
+  Events are removed from the phone only after the collector replies "ok", so a broken link loses nothing.
 */
-const ANALYTICS_URL = '';
+const ANALYTICS_URL = 'https://script.google.com/macros/s/AKfycbx6XDw7WL5UpSb_qsl9IDl82sRGYeE9qKdZe5LuVxSu4JudsR_MZZ-HH7hxS2XAwwliJg/exec';
 
 (function () {
   const KEY = 'hsq2.analytics';
@@ -34,14 +35,19 @@ const ANALYTICS_URL = '';
     sending = true;
     const batch = q.slice(0, BATCH);
     try {
-      // text/plain + no-cors keeps this a simple request that Apps Script accepts from any site.
-      await fetch(ANALYTICS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ events: batch }) });
+      // A plain-text POST is a "simple" request, so Apps Script accepts it from any site
+      // and we can read its reply. Events leave the phone only after the Sheet says "ok".
+      const res = await fetch(ANALYTICS_URL, { method: 'POST', body: JSON.stringify({ events: batch }) });
+      const text = res.ok ? await res.text() : '';
+      if (!/^ok\b/.test(text)) throw new Error('collector replied: ' + (text || res.status).toString().slice(0, 60));
       const rest = read('queue', []).slice(batch.length);
       write('queue', rest);
+      write('last', { ok: new Date().toISOString() });
       sending = false;
       if (rest.length) setTimeout(flush, 500);
     } catch (e) {
-      sending = false; // offline or blocked: keep the queue and try later
+      sending = false; // offline, blocked or a bad link: keep the queue and try later
+      write('last', { error: String(e && e.message || e).slice(0, 80), at: new Date().toISOString() });
     }
   }
 
@@ -76,5 +82,6 @@ const ANALYTICS_URL = '';
     get consent() { return read('consent', null); },
     get queued() { return read('queue', []).length; },
     get configured() { return !!ANALYTICS_URL; },
+    get last() { return read('last', null); },
   };
 })();

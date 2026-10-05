@@ -50,6 +50,16 @@ Nothing else is collected: no names, no recordings, no typed text, no location.
 - **Hardest words:** filter `quiz_answer`, with rows = word, value = average of `correct`.
 - **Word mix-ups:** filter `quiz_answer` to `correct = 0`, with rows = word, columns = picked.
 
+## Checking it works
+
+1. Open the app, tap **Yes, share** on the parent card and answer the sum.
+2. Do anything, such as one ayah in "Your turn", then go back to the home screen.
+3. Within a few seconds a row should appear in the `events` tab.
+
+The footer on the home screen helps:
+- "(3 waiting to send)" means events are still on the phone, for example because it's offline.
+- "last try failed" means the Sheet didn't confirm. Check that the deployment's **Who has access** is **Anyone**, that you redeployed with **New version** after any script edit, and that the link in `analytics.js` matches **Deploy → Manage deployments**. Nothing is lost while you fix it.
+
 ## Turning it off
 
 - **A parent can switch sharing off** from the link at the bottom of the home screen. That also deletes any events waiting on that phone.

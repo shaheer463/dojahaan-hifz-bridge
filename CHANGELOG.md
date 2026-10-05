@@ -7,6 +7,13 @@ Versions follow [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH.
 - **MINOR** (1.1.0): new features that keep everyone's saved progress, like surah stories or more words.
 - **MAJOR** (2.0.0): big changes that could reset or move saved progress, or new surah ranges.
 
+## [1.1.1] - 2026-10-05
+
+### Changed
+- Connected the app to the DoJahaan Google Sheet collector.
+- Events now leave the phone only after the Sheet confirms it received them, so a broken or misconfigured link loses nothing; they wait and retry.
+- When sharing is on, the home screen footer shows how many events are waiting to send and whether the last try failed. That makes it easy to check the setup.
+
 ## [1.1.0] - 2026-10-05
 
 ### Added
